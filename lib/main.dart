@@ -1,113 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:english_words/english_words.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // StatelessWidget を継承するkとでアプリ自体が Widget になる
   @override
+  // build() メソッドでウィジェットの UI を作成する
   Widget build(BuildContext context) {
+    // マテリアルデザインでのアプリを作成するための宣言
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      // 右上のデバッグラベルを非表示にする
+      debugShowCheckedModeBanner: false,
+      title: 'Startup Name Generator',
+      // Scaffold ウィジェットは、アプリケーションバーやタイトル、ホーム画面のウィジェットツリーを、
+      // 保持する body プロパティを提供している
+      // ただし、ウィジェットのサブツリーはかなり複雑になる可能性がある
+      home: RandomWords(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+// 最小の状態保持クラスを作成する (StatefulWidget の中身部分)
+// State<RondomWords> と書くことで、汎用の State クラスのジェネリクスに RandomWords を記載し、
+// RandomWords ウィジェットの状態を維持できるようにする
+class RandomWordsState extends State<RandomWords> {
+  // 変数やメソッド名の前につけるアンダースコア (_) は Private を意味し、
+  // クラス内からしかアクセスはできない
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  // 単語を保存するためのリスト
+  final _suggestions = <WordPair>[];
+  // フォントサイズを指定するためのインスタンス
+  final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('Startup Name Generator'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // _buildSuggestions 関数を呼び出す
+      body: _buildSuggestions(),
     );
   }
+
+  // 本メソッドで ListView を作成する
+  Widget _buildSuggestions() {
+    // ListView クラスの builder にある itemBuilder には無名関数を定義する
+    // 引数として BuildContext と行番号 (i) が渡される
+    // i は 0 から始まり、呼び出されるたびに加算される
+    // （今回の構成ではユーザーがスクロールする食べにリストが無限に増加する）
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      // itemBuilder で一行ごとに処理が呼ばれ、偶数業の場合に ListTile を表示し、
+      // 奇数行の時に Divider を表示する
+      itemBuilder: (context, i) {
+        // 1 ピクセルの高さの仕切りを ListView に追加していく
+        if (i.isOdd) return Divider();
+
+        // 行数を 2 で割った時の整数値を求める
+        // これにより、Divider で線を入れた行を除いた状態の英文数を計算する
+        final index = i ~/ 2;
+        if (index >= _suggestions.length) {
+          // 利用可能な英文リスト数を超えた場合は、さらに 10 個の英文を生成し、リストに追加
+          _suggestions.addAll(generateWordPairs().take(10));
+        }
+        // 最後に現在の行で表示する英文をリストから取得し、_buildRow メソッドで表示用に整形
+        return _buildRow(_suggestions[index]);
+      },
+    );
+  }
+
+  // _buildRow メソッド
+  Widget _buildRow(WordPair pair) {
+    return ListTile(
+      title: Text(
+        pair.asPascalCase,
+        style: _biggerFont,
+      ),
+    );
+  }
+}
+
+// RandomWords ウィジェットを、StatefulWidget を継承することで作成する
+// (State クラスのインスタンスを作成するStatefulWidget クラスで、これ自体はステートレス)
+class RandomWords extends StatefulWidget {
+  @override
+  RandomWordsState createState() => new RandomWordsState();
 }
