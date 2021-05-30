@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:english_words/english_words.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,6 +10,9 @@ class MyApp extends StatelessWidget {
   @override
   // build() メソッドでウィジェットの UI を作成する
   Widget build(BuildContext context) {
+    // 表示される文字列をランダムな英語に変更する
+    final wordPair = WordPair.random();
+
     // マテリアルデザインでのアプリを作成するための宣言
     return MaterialApp(
       // 右上のデバッグラベルを非表示にする
@@ -22,7 +26,7 @@ class MyApp extends StatelessWidget {
           appBar: AppBar(title: Text('Welcome to Flutter')),
           // body では様々な表現が可能で、今回は Center で中央配置、Text で文字列を配置している
           body: Center(
-            child: Text('Hello World'),
+            child: Text(wordPair.asPascalCase),
           )),
     );
   }
