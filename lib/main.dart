@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
           appBar: AppBar(title: Text('Welcome to Flutter')),
           // body では様々な表現が可能で、今回は Center で中央配置、Text で文字列を配置している
           body: Center(
+            // StatefulWidget を利用して文字列を表示する
             child: RandomWords(),
           )),
     );
