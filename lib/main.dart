@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
 // 最小の状態保持クラスを作成する (StatefulWidget の中身部分)
 // State<RondomWords> と書くことで、汎用の State クラスのジェネリクスに RandomWords を記載し、
 // RandomWords ウィジェットの状態を維持できるようにする
-class RandomWordsState extends State<RandomWords> {
+class _RandomWordsState extends State<RandomWords> {
   // 変数やメソッド名の前につけるアンダースコア (_) は Private を意味し、
   // クラス内からしかアクセスはできない
 
@@ -56,7 +56,8 @@ class RandomWordsState extends State<RandomWords> {
       padding: const EdgeInsets.all(16.0),
       // itemBuilder で一行ごとに処理が呼ばれ、偶数業の場合に ListTile を表示し、
       // 奇数行の時に Divider を表示する
-      itemBuilder: (context, i) {
+      // itemBuilder はコールバック関数で、関数が呼び出されるたびにイテレータ (i) が1 ずつ増加する
+      itemBuilder: (BuildContext _context, int i) {
         // 1 ピクセルの高さの仕切りを ListView に追加していく
         if (i.isOdd) return Divider();
 
@@ -88,5 +89,5 @@ class RandomWordsState extends State<RandomWords> {
 // (State クラスのインスタンスを作成するStatefulWidget クラスで、これ自体はステートレス)
 class RandomWords extends StatefulWidget {
   @override
-  RandomWordsState createState() => new RandomWordsState();
+  _RandomWordsState createState() => new _RandomWordsState();
 }
